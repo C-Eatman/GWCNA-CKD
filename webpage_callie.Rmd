@@ -1,0 +1,242 @@
+---
+title: "Module Detection and Functional Analysis of Genes to Determine Potential Biomarkers for the Progression of Chronic Kidney Disease "
+author: "Callie Eatman"
+date: 
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+require(knitr)
+require(kableExtra)
+require(tidyverse)
+
+```
+# Introduction {-}
+
+**_Chronic kidney disease is not a disease_**
+
+Chronic Kidney Disease (CKD) is an umbrella term for conditions that cause permanent and progressive damage to the kidneys. CKD is diagnosed through the detection of structural or functioinal damage and/or screening of glomerular filtration rate (GFR) and urine albumin concentrations.^[1][1]^ While CKD is mostly caused by conditions of high heterogenity such as, renal vascular disease and diabetic kidney disease, many monogenic kidney disorders have been revealed such as steroid-resistant nephrotic syndrome and polycystic kidney disease. This diversity in the genetic basis of CKD conditions is underscored by the lack of a clear gene expression profile for CKD.^[2][2]^
+
+There is now a unifying classification scheme that categorizes chronic diseases of the kidneys into five stages on the basis of the eGFR.However, eGFR has been found to be a poor indicator for certain conditions.^[3][3]^
+
+**_The need for universal biomarkers for CKD progression_**
+
+Most forms of CKD eventually progress to end-stage renal disease which produces the need for biomarkers to allow early identification of CKD patients with high risk of progression.^[2][2]^ Currently, the mechanisms of the progression of CKD are poorly understood.Progression is evaluated by the decline in the level of kidney function which is estimated by eGFR and serum creatinine in patients that have been followed reliably through assays of kidney function, however, GFR is difficult to model over time. 
+
+CKD progression is currently defined as a progressive loss of kidney function over a period of time greater than the "natural" kidney function loss caused by aging alone.^[2][2]^  The lack of a unique definition of CKD progresion leads to disparities in the comparison of biomarkers across different studies.
+
+A biomarker is a characterisitc that is objectively measured as an indicator of biological/pathogenic processes. Ideal biomarkers should reflect the level of structural/functional level of damage of the kidneys or correlate to the progressive decline of kidney function. Molecular markers identification is challenging for CKD as a highly heterogeneous disease.Identifying diagnostic biomarkers and therapeutic targets can be done using gene expression profiles of CKD patients. 
+
+ 
+<br> 
+
+# Data {-}
+
+[Gene expression profiles of twenty-five individuals](https://www.ebi.ac.uk/gxa/experiments/E-GEOD-48944/Results?specific=true&geneQuery=%255B%255D&filterFactors=%257B%257D&cutoff=%257B%2522foldChange%2522%253A1%252C%2522pValue%2522%253A0.05%257D&regulation=%2522UP_DOWN%2522) were used for the WGCNA analysis. Fifty-two of 12,070 genes from Array: A-AFFY-37 were used for module detection as they were listed as differentially expressed.Twenty-five samples were included: thirteen with CKD and twelve as a reference.
+
+
+
+```{r data}
+genedata<-read.table("differentiallyexpgenes_callie.txt", header=T, sep="\t")
+df<-genedata
+color.me <- which(df$Log2.fold.change <0)
+
+df %>% 
+  kable(booktabs = T,caption = "Differentially expressed genes: CKD vs normal") %>%
+  kable_styling(bootstrap_options = c("hover","condensed")) %>%
+  row_spec(color.me, bold = T, color = "black", background = "lightblue")%>%
+   scroll_box(height = "200px")
+
+
+```
+
+>The table above contains the fifty-two differentially expressed genes used in the analysis. Rows in blue are genes that were down-regulated in individuals with CKD (indicated by a negative Log~2~-fold change) while all others were up-regulated in CKD individuals.
+
+<br>
+
+# Analysis {-}
+
+
+
+<p align="center">
+![](flow_callie.PNG)
+</p>
+
+<p align="center">
+<span style="color: grey;">Figure 1: Methods flowchart</span>
+<p/p>
+
+> Methods used to detect modules and to determine the functional profiles of gene sets detected are shown in 'Figure 1.' 
+
+<br>
+
+<br>
+<br>
+<p align="center">
+ **Data Cleaing and Preprocessing**
+<p/p>
+<br>
+
+
+<p align="center">
+![](outlierclusteringnormal_callie.PNG){width=40%}![](outlierdetectCKD_callie.PNG){width=40%} 
+</p>
+
+<p align="center">
+<span style="color: grey;">Figure 2: Clustering dendrograms of normal and CKD samples based on their Euclidean distance.</span>
+</p>
+
+> Figure 2 displays the clustering of both samples (normal and CKD) used to detect outliers. Hierarchial cluster analysis was implemented which used average linkage. One outlier was removed from each sample, shown above the red line, leaving eleven individuals in the normal sample and twelve in the CKD sample.
+
+<br>
+<p align="center">
+![](powernormal_callie.PNG){width=40%} ![](ckdpower_callie.PNG){width=40%}
+</p>
+
+<p align="center">
+<span style="color: grey;">Figure 3: Analysis of network topology for various soft-thresholding powers. The left panel shows the scale-free fit
+index (y-axis) as a function of the soft-thresholding power (x-axis). The right panel displays the mean connectivity
+(degree, y-axis) as a function of the soft-thresholding power (x-axis).</span>
+<p/p>
+
+> The left two graphs of 'Figure 3' show the analysis of network topology for soft-thresholding powers for the normal sample while the right two graphs are for the CKD samples.The soft-threshold power to which co-expression similarity is raised to calculate adjacency is necessary for constructing a weighted gene network.^[4][4]^ The soft-threshold power for module detection chosen for the normal samples was 14. The soft-threshold power for module detection chosen for the CKD samples was 9.
+<br>
+
+<br>
+<br>
+<p align="center">
+ **Network Construction and Module Detection**
+<p/p>
+<br>
+
+<p align="center">
+![](normdend_callie.PNG){width=40%} ![](ckddend_callie.PNG){width=40%}
+</p>
+
+<p align="center">
+<span style="color: grey;">Figure 4: Clustering dendrogram of genes for normal and CKD samples, with dissimilarity based on topological overlap, together with assigned module colors.
+</span>
+<p/p>
+
+>The dendrograms shown in 'Figure 4' indicate the genes associated with the only detected module, the turqouise module, for the fifty-two differentially expressed genes. There is similarity between the genes clustered in each module, however, 'Figure 6' indicates the difference in genes clusted in the turqouise module by sample. The grey color in 'module colors' indicates the genes not aligned within a module. Only one module was found, as expected, since the chosen genes were determined to be differentially expressed, i.e. they are likely to be co-expressed.
+<br>
+<br>
+
+![](12070 modules block 1_callie.PNG){width=33%} ![](12070 modules block 2_callie.PNG){width=33%} ![](12070 modules block3_callie.PNG){width=33%}
+
+<p align="center">
+<span style="color: grey;">Figure 5: Clustering dendrogram of 12070 genes for combined normal and CKD samples There is one gene dendrogram per block.
+</span>
+<p/p>
+
+> Data used for the dendrograms in 'Figure 5' were not used in the rest of the analysis. These dendrograms are displayed to show how multiple modules detected would be represented when the data are not entirely determined to be differentially expressed. All 12070 genes included in the original data were used for this section. Three blocks are shown as the data was split during module detection because a large number of genes were used.
+
+<br>
+<br>
+<p align="center">
+ **Module Relation**
+<p/p>
+<br>
+
+
+<p align="center">
+![](correspondence_callie.PNG)
+</p>
+<br>
+
+
+
+
+
+
+<p align="center">
+<span style="color: grey;">Figure 6: Correspondence of normal module and CKD module. The top row
+of the table corresponds to the turqouise module (labeled by color as well as text), and the right-most column
+corresponds to the CKD turqouise module. Numbers in the table indicate gene counts in the intersection of the
+corresponding modules. Coloring of the table encodes − log(p), with p being the Fisher’s exact test p-value for
+the overlap of the two modules. The stronger the red color, the more significant the overlap is. 
+</span>
+<p/p>
+
+> The table in 'Figure 6' indicates that twenty genes in the CKD turqouise module are also found in the normal turqouise module. The remaining fifteen genes exclusive to the CKD turqouise module were analyzed for similar functional profiles using gene ontology term enrichment. 'Figure 8' and 'Figure 9' list genes associated with GO enrichment terms. 
+<br>
+<br>
+
+<p align="center">
+ **Gene Ontology**
+<p/p>
+<br>
+
+```{r GO}
+GO<-read.table("goresults_callie.txt", header=T, sep="\t")
+kable(GO, "html") %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"),full_width = F) 
+  
+```
+
+<p align="center">
+<span style="color: grey;">Figure 7: Results from GO enrichment analysis </span>
+<p/p>
+<br>
+
+> The results of the GO enrichment analysis in 'Figure 7' indicate the number of genes in the uploaded list (fifteen genes exclusive to the CKD turqouise module) that map to the annotation data. The immune response category has nine genes aligned, with 1.43 genes expected in the category based on the reference list.The immune system process category has twelve genes aligned with 2.12 genes expected in the categpry based on the reference list. The p-value for both categories is highly significant.  There was over-representation in both categories, i.e. more genes were observed than expected based on the refernece list for the category.
+
+
+
+<p align="center">
+```{r GO9}
+GO9<-read.table("9immunologicalresponse_callie.txt", header=T, sep="\t")
+kable(GO9, "html", caption="Immune Response") %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"),full_width = F) %>%
+  scroll_box(height = "200px",width="100%")
+  
+```  
+<p/p>
+
+<p align="center">
+<span style="color: grey;">Figure 8: Genes associated with GO term "Immune response."</span>
+<p/p>
+<br>
+<p align="center">
+```{r GO12}
+GO12<-read.table("12immunesysprocess_callie.txt", header=T, sep="\t")
+kable(GO12, "html", caption="Immune System Response") %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"),full_width = F) %>%
+  scroll_box(height = "200px",width="100%")
+  
+```
+<p/p>
+
+<p align="center">
+<span style="color: grey;">Figure 9: Genes associated with GO term "Immune system response."</span>
+<p/p>
+
+>  Gene Ontology (GO) term enrichment analysis assigns genes to a set of bins depending on functional characteristics, identifying processes that are enriched in the input group. A group of genes assigned to a GO term have a coherent functional signal. GO enrichment for biological processes was used to determine functional profiles of genes that were exclusively found in the CKD turqouise module. 'Figure 8' shows the nine genes associated with the GO term "Immune response." 'Figure 9' shows the twelve genes associated with the GO term "Immune system response."
+<br>
+<br>
+
+# Summary {-} 
+
+
+
+Modules of co-expression were determined using parts of the [WGCNA tutorial](https://horvath.genetics.ucla.edu/html/CoexpressionNetwork/Rpackages/WGCNA/Tutorials/). WGCNA identifies genes that show similar expression patterns across samples/conditions. First, a correlation network is constructed where a gene is a node that other genes will group with if they pass a set-threshold of co-expression strength. The importance of module detection lies in the potential discovery of co-expressed genes within a sample which can be used as diagnostic biomarkers for a condition.
+
+[The Gene Ontology website](http://geneontology.org/) contains a GO enrichment analysis tool used to functionally profile a set of genes. The genes detected exclusively in the CKD turqouise module were inputted to determine functional profiles. The alignment of genes with the "immune response" and "immune system process" indicate the genes have similar biological processes and can be further analyzed as potential biomarkers for CKD.
+
+
+
+
+# References {-}
+
+[1]: https://www.hopkinsmedicine.org/health/conditions-and-diseases/chronic-kidney-disease
+[2]: https://www.ncbi.nlm.nih.gov/pubmed/31257514
+[3]: https://cjasn.asnjournals.org/content/12/2/346
+[4]: https://horvath.genetics.ucla.edu/html/CoexpressionNetwork/Rpackages/WGCNA/Tutorials/FemaleLiver-02-networkConstr-auto.pdf
+```
+1 https://www.hopkinsmedicine.org/health/conditions-and-diseases/chronic-kidney-disease
+2 https://www.ncbi.nlm.nih.gov/pubmed/31257514
+3 https://cjasn.asnjournals.org/content/12/2/346
+4 https://horvath.genetics.ucla.edu/html/CoexpressionNetwork/Rpackages/WGCNA/Tutorials/FemaleLiver-02-networkConstr-auto.pdf
+```
+
