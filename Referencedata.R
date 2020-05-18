@@ -1,3 +1,6 @@
+####followed and adjusted WGCNA tutorial by Steve Horvath- UCLA
+
+
 ####loading expression data NORMAL
 options(stringsAsFactors = FALSE)
 Ref2data=read.csv("CVDReferencedata.csv")
