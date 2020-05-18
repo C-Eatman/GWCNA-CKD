@@ -1,5 +1,5 @@
 
-
+##Followed and adjusted WGCNA tutorial by Steve Horvath- UCLA
 
 ####this one
 if (!requireNamespace("BiocManager", quietly = TRUE))
